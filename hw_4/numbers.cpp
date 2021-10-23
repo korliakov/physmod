@@ -6,9 +6,27 @@
 
 
 
+float K_sum(float a, float b) {
+
+	float sum = 0.0;
+	float c = 0.0;
+
+	float y = a - c;
+	float t = sum + y;
+	c = (t - sum) - y;
+	sum = t;
+
+	float y = b - c;
+	float t = sum + y;
+	c = (t - sum) - y;
+	sum = t;
+
+	return sum;
+}
 
 
-void data_t(float delta, int N, std::vector<double> &x, std::vector<double> &v) {
+
+void data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v) {
 
 
 	float v_cur = 0;
@@ -29,7 +47,7 @@ void data_t(float delta, int N, std::vector<double> &x, std::vector<double> &v) 
 
 }
 
-void predict_correct_data_t(float delta, int N, std::vector<double> &x, std::vector<double> &v) {
+void predict_correct_data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v) {
 
 
 	float v_cur = 0;
@@ -58,9 +76,10 @@ int main(int argc, char *argv[]) {
 
 
 	long double delta = atof(argv[2]); 
-	int N = 10000;
-	std::vector<double> x;
-	std::vector<double> v;
+	int T = 100;
+	int N = int(T/delta);
+	std::vector<float> x;
+	std::vector<float> v;
 	float t = 0;
 
 	// 	data_t(delta, N, x, v);
