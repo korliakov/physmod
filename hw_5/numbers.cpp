@@ -51,7 +51,7 @@ void data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v, do
 void predict_correct_data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v, double alpha) {
 
 
-	float v_cur = 0;
+	float v_cur = 2;
 	float x_cur = 10;
 
 	x.push_back(x_cur);
@@ -60,10 +60,10 @@ void predict_correct_data_t(float delta, int N, std::vector<float> &x, std::vect
 	for (int i = 0; i < N; i++) {
 
 		float x_pred = x[x.size() - 1] + v[v.size() - 1] * delta;
-		float v_pred = v[v.size() - 1] - x[x.size() - 1] * delta;
+		float v_pred = v[v.size() - 1] - alpha * alpha * sin(x[x.size() - 1]) * delta;
 
 		x_cur = x[x.size() - 1] + delta * (v[v.size() - 1] + v_pred) / 2;
-		v_cur = v[v.size() - 1] - delta * (x[v.size() - 1] + x_pred) / 2;
+		v_cur = v[v.size() - 1] - delta * alpha * alpha * (sin(x[x.size() - 1]) + sin(x_pred) )/2;
 
 		x.push_back(x_cur);
 		v.push_back(v_cur);
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
 
 	long double delta = atof(argv[2]); 
-	int T = 100;
+	int T = 1000;
 	int N = int(T/delta);
 	std::vector<float> x;
 	std::vector<float> v;
@@ -85,8 +85,8 @@ int main(int argc, char *argv[]) {
 
 	double alpha = atof(argv[3]);
 
-		// predict_correct_data_t(delta, N, x, v, alpha);
-	data_t(delta, N, x, v, alpha);
+		predict_correct_data_t(delta, N, x, v, alpha);
+	// data_t(delta, N, x, v, alpha);
 
 
 
