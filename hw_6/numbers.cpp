@@ -26,12 +26,12 @@
 // }
 
 
+template <typename T>
+void data_t(float delta, int N, std::vector<T> &x, std::vector<T> &v, double gamma, double w) {
 
-void data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v, double gamma, double w) {
 
-
-	float v_cur = 0;
-	float x_cur = 1;
+	T v_cur = 0;
+	T x_cur = 1;
 
 
 	x[0] = x_cur;
@@ -51,19 +51,21 @@ void data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v, do
 
 }
 
-void predict_correct_data_t(float delta, int N, std::vector<float> &x, std::vector<float> &v, double gamma, double w) {
+
+template <typename T>
+void predict_correct_data_t(float delta, int N, std::vector<T> &x, std::vector<T> &v, double gamma, double w) {
 
 
-	float v_cur = 0;
-	float x_cur = 1;
+	T v_cur = 0;
+	T x_cur = 1;
 
 	x[0] = x_cur;
 	v[0] = v_cur;
 
 	for (int i = 1; i < N; i++) {
 
-		float x_pred = x[i-1] + v[i-1] * delta;
-		float v_pred = v[i-1] - (2*gamma*v[i-1] + w*w*x[i-1]) * delta;
+		T x_pred = x[i-1] + v[i-1] * delta;
+		T v_pred = v[i-1] - (2*gamma*v[i-1] + w*w*x[i-1]) * delta;
 
 		x_cur = x[i-1] + delta * (v[i-1] + v_pred) / 2;
 		v_cur = v[i-1] - delta * (2*gamma*v[i-1] + w*w*x[i-1] + 2*gamma*v_pred + w*w*x_pred )/2;
@@ -78,31 +80,37 @@ void predict_correct_data_t(float delta, int N, std::vector<float> &x, std::vect
 
 
 //дописать!!
+template <typename T>
+void rk4(double delta, int N, std::vector<T> &x, std::vector<T> &v, double gamma, double w) {
 
-void rk4(float delta, int N, std::vector<float> &x, std::vector<float> &v, double gamma, double w) {
 
-
-	float v_cur = 0;
-	float x_cur = 1;
+	T v_cur = 0;
+	T x_cur = 1;
 
 	x[0] = x_cur;
 	v[0] = v_cur;
 
 	for (int i = 1; i < N; i++) {
 
-		
-		float v1 = v[i-1] - (2*gamma*v[i-1] + w*w*x[i-1]) * delta;
-		float x1 = x[i-1] + v[i-1] * delta;
+		T k1_v = -(2*gamma*v[i-1] + w*w*x[i-1]);
+		T k1_x = v[i-1];
 
-		
-		float v2 = 
-		float x2 = 
+		T k2_v = -(2*gamma*(v[i-1] + delta*k1_v*0.5) + w*w*(x[i-1] + k1_x * delta*0.5));
+		T k2_x = v[i-1] +  delta*k1_v/2;
+
+		T k3_v = -(2*gamma*(v[i-1] + delta*k2_v*0.5) + w*w*(x[i-1] + k2_x * delta*0.5));
+		T k3_x = v[i-1] +  delta*k2_v/2;
+
+		T k4_v = -(2*gamma*(v[i-1] + delta*k3_v) + w*w*(x[i-1] + k3_x * delta));
+		T k4_x =  v[i-1] +  delta*k3_v;
 
 
 
 
-		x_cur = x[i-1] + delta * (v[i-1] + v_pred) / 2;
-		v_cur = v[i-1] - delta * (2*gamma*v[i-1] + w*w*x[i-1] + 2*gamma*v_pred + w*w*x_pred )/2;
+
+
+		x_cur = x[i-1] + delta * (k1_x + 2*k2_x + 2*k3_x + k4_x) / 6;
+		v_cur = v[i-1] + delta * (k1_v + 2*k2_v + 2*k3_v + k4_v)/6;
 
 		x[i] = x_cur;
 		v[i] = v_cur;
@@ -117,17 +125,18 @@ int main(int argc, char *argv[]) {
 
 	std::string path1 = argv[1];
 	std::string path2 = argv[2];
-	long double delta = atof(argv[3]); 
-	double gamma = atof(argv[4]);
-	double w = atof(argv[5]);
+	std::string path3 = argv[3];
+	long double delta = atof(argv[4]); 
+	double gamma = atof(argv[5]);
+	double w = atof(argv[6]);
 
 
-	int T = 100;
+	int T = 1000;
 	int N = int(T/delta);
-	std::vector<float> x = std::vector<float>(N);
-	std::vector<float> v = std::vector<float>(N);
+	std::vector<double> x = std::vector<double>(N);
+	std::vector<double> v = std::vector<double>(N);
 
-	float t = 0;
+	double t = 0;
 
 	
 
@@ -178,4 +187,31 @@ int main(int argc, char *argv[]) {
 
         }
     }
+
+
+    t = 0;
+
+    x.resize(0);
+    v.resize(0);
+
+    rk4<double>(delta, N, x, v, gamma, w);
+
+    std::ofstream out3(path3);
+
+
+	if (out3.is_open())
+    {
+
+
+        for (int i = 0; i < N; i++) {
+
+        	out3 << x[i] << ' ' << v[i] << ' ' << t << "\n";
+
+        	t+=delta;
+
+
+        }
+    }
+
+
 }
